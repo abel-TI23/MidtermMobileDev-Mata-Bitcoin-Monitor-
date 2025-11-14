@@ -83,7 +83,15 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a'
+            universalApk false
+        }
     }
     signingConfigs {
         debug {
@@ -98,11 +106,12 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
+            // NOTE: Using debug signing for demo build (not for production)
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources enableProguardInReleaseBuilds
+            // Enable resource shrinking when minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 }
@@ -116,4 +125,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+}
+
+// Fix: Ensure Hermes tooling libraries are packaged into APK for New Architecture
+android.packagingOptions {
+    pickFirst 'lib/*/libhermes*.so'
+    pickFirst 'lib/*/libjsi.so'
+    pickFirst 'lib/*/libreactnative*.so'
+    pickFirst 'lib/*/libworklets.so'
 }
