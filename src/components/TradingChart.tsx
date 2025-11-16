@@ -1,10 +1,11 @@
 /**
  * TradingChart Component
- * Candlestick/line chart with tap interaction
+ * Candlestick/line chart with tap interaction and pinch-to-zoom
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableWithoutFeedback, GestureResponderEvent } from 'react-native';
+import { GestureHandlerRootView, PinchGestureHandler, State } from 'react-native-gesture-handler';
 import Svg, { Line, Rect, G, Text as SvgText } from 'react-native-svg';
 import { Candle } from '../utils/binanceAPI';
 import { colors } from '../theme';
@@ -29,8 +30,12 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const marginTop = 20;
   const marginBottom = 50;
 
-  // Show last 60 candles for better spacing
-  const visibleCount = Math.min(60, candles.length);
+  // Zoom state
+  const [visibleCandleCount, setVisibleCandleCount] = useState(50);
+  const baseScale = useRef(1);
+
+  // Show last N candles based on zoom level
+  const visibleCount = Math.min(visibleCandleCount, candles.length);
   const visibleCandles = useMemo(() => {
     if (candles.length <= visibleCount) return candles;
     return candles.slice(-visibleCount);
@@ -115,6 +120,19 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const selectedCandle = crossIndex !== null ? visibleCandles[crossIndex] : null;
   const livePrice = currentPrice ?? (candles.length ? candles[candles.length - 1].close : null);
 
+  // Pinch-to-zoom handler
+  const onPinchEvent = (event: any) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      const scale = event.nativeEvent.scale;
+      // Zoom in = fewer candles (min 20), Zoom out = more candles (max 100)
+      const newCount = Math.round(50 / scale);
+      const clampedCount = Math.max(20, Math.min(100, newCount));
+      setVisibleCandleCount(clampedCount);
+    } else if (event.nativeEvent.state === State.END) {
+      baseScale.current = 1;
+    }
+  };
+
   const selectedMetrics = useMemo(() => {
     if (!selectedCandle) return null;
     const change = selectedCandle.close - selectedCandle.open;
@@ -148,7 +166,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const minPrice = Math.min(...visibleCandles.map(c => c.low));
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       {/* Floating Tooltip Overlay */}
       {selectedCandle && selectedMetrics && (
         <View style={styles.floatingTooltip} pointerEvents="none">
@@ -165,11 +183,12 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
       <View style={styles.headerRow}>
         <Text style={styles.title}>Price Chart</Text>
-        <Text style={styles.hint}>👆 Tap & hold on chart</Text>
+        <Text style={styles.hint}>👆 Tap • 🤏 Pinch to zoom</Text>
       </View>
 
-      <TouchableWithoutFeedback onPress={handlePress}>
-        <View>
+      <PinchGestureHandler onGestureEvent={onPinchEvent} onHandlerStateChange={onPinchEvent}>
+        <TouchableWithoutFeedback onPress={handlePress}>
+          <View>
           <Svg width={chartWidth} height={chartHeight}>
           {/* Horizontal grid & y-axis */}
           <G>
@@ -194,10 +213,11 @@ const TradingChart: React.FC<TradingChartProps> = ({
                 const color = isUp ? '#22C55E' : '#EF4444';
                 const bodyTop = Math.min(openY, closeY);
                 const bodyHeight = Math.max(1, Math.abs(closeY - openY));
+                const candleWidth = 10; // Increased from 6px
                 return (
                   <G key={i}>
-                    <Line x1={x} y1={highY} x2={x} y2={lowY} stroke={color} strokeWidth={1} />
-                    <Rect x={x - 3} y={bodyTop} width={6} height={bodyHeight} fill={color} />
+                    <Line x1={x} y1={highY} x2={x} y2={lowY} stroke={color} strokeWidth={1.5} />
+                    <Rect x={x - candleWidth/2} y={bodyTop} width={candleWidth} height={bodyHeight} fill={color} />
                   </G>
                 );
               })}
@@ -240,6 +260,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
         </Svg>
         </View>
       </TouchableWithoutFeedback>
+      </PinchGestureHandler>
 
       {/* Legend */}
       <View style={styles.legendContainer}>
@@ -268,7 +289,8 @@ const TradingChart: React.FC<TradingChartProps> = ({
             const fill = isUp ? '#22C55E' : '#EF4444';
             const y = toVolumeY(c.volume);
             const barH = volumeHeight - 40 - y + 20;
-            return <Rect key={i} x={x - 2.5} y={y} width={5} height={Math.max(1, barH)} fill={fill} opacity={0.8} />;
+            const barWidth = 8; // Increased from 5px
+            return <Rect key={i} x={x - barWidth/2} y={y} width={barWidth} height={Math.max(1, barH)} fill={fill} opacity={0.8} />;
           })}
         </G>
         {/* X-axis labels for volume */}
@@ -276,8 +298,8 @@ const TradingChart: React.FC<TradingChartProps> = ({
           <SvgText key={i} x={l.x} y={volumeHeight - 10} fill={colors.textMuted} fontSize={10} textAnchor="middle">{l.text}</SvgText>
         ))}
       </Svg>
-      <Text style={styles.footnote}>Last {visibleCandles.length} candles • Drag for crosshair • Real-time updates</Text>
-    </View>
+      <Text style={styles.footnote}>Last {visibleCandles.length} candles • Tap for details • Pinch to zoom (20-100) • Real-time updates</Text>
+    </GestureHandlerRootView>
   );
 };
 

@@ -47,10 +47,8 @@ export const DEFAULT_TWITTER_ACCOUNTS: TwitterAccount[] = [
 ];
 
 export const DEFAULT_YOUTUBE_CHANNELS: YouTubeChannel[] = [
-  { channelId: 'UCqK_GSMbpiV8spgD3ZGloSw', name: 'Bravos Research', enabled: true },
-  { channelId: 'UC59NTy8HCsUOGcdX5P-5W9w', name: 'Bitcoin Magazine', enabled: true },
+  { channelId: 'UCOHxDwCcOzBaLkeTazanwcw', name: 'Bravos Research', enabled: true },
+  { channelId: 'UCtOV5M-T3GcsJAq8QKaf0lg', name: 'Bitcoin Magazine', enabled: true },
   { channelId: 'UCIALMKvObZNtJ6AmdCLP7Lg', name: 'Bloomberg Television', enabled: true },
   { channelId: 'UCBH5VZE_Y4F3CMcPIzPEB5A', name: 'Real Vision', enabled: true },
-  { channelId: 'UCRvqjQPSeaWn-uEx-w0XOIg', name: 'Benjamin Cowen', enabled: true },
-  { channelId: 'UCg3vZOCb8fRUe0rDUSNowrA', name: 'The Chart Guys', enabled: true },
 ];
