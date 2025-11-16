@@ -47,6 +47,7 @@ import {
 import { calculateEMA, calculateSMA } from '../utils/indicators';
 import { generateMockCandles, generateMockTicker, updateMockCandle } from '../utils/mockData';
 import { useKlines } from '../market/MarketDataManager';
+import { useSettings } from '../hooks/useSettings';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Home'>,
@@ -55,6 +56,7 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const { settings, refreshSettings } = useSettings();
   // State management
   const [candles, setCandles] = useState<Candle[]>([]);
   // Removed local price/volume/change states to avoid frequent screen-wide re-renders
@@ -89,6 +91,9 @@ const HomeScreen: React.FC = () => {
 
   const fallbackPollRef = useRef<any>(null);
   const latestKline = useKlines('1m', 'BTCUSDT');
+
+  // Calculate active alerts count
+  const activeAlertsCount = settings.priceAlerts.filter(a => a.enabled).length;
 
   const showNotice = (key: string, message: string, type: 'info'|'warning'|'error'|'success' = 'info', cooldownMs = 60000, autoHide?: number) => {
     const now = Date.now();
@@ -207,7 +212,7 @@ const HomeScreen: React.FC = () => {
             })
             .catch(() => {});
         }
-      }, POLLING_INTERVALS.TICKER_MS);
+      }, settings.pollingInterval);
 
       // Less frequent candle refresh for chart sync in polling mode
       const candleTimer = setInterval(() => {
@@ -364,6 +369,23 @@ const HomeScreen: React.FC = () => {
               label={useMockData ? 'Demo Mode' : USE_WEBSOCKET ? (isConnected ? 'Live' : 'Connecting...') : 'Polling'}
               tone={useMockData ? 'violet' : USE_WEBSOCKET ? (isConnected ? 'success' : 'default') : 'accent'}
             />
+            {!USE_WEBSOCKET && !useMockData && (
+              <Badge
+                label={`${settings.pollingInterval / 1000}s`}
+                tone="default"
+              />
+            )}
+            {activeAlertsCount > 0 && (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Settings')}
+                activeOpacity={0.7}
+              >
+                <Badge
+                  label={`🔔 ${activeAlertsCount}`}
+                  tone="accent"
+                />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.settingsButton}
               onPress={() => navigation.navigate('Settings')}

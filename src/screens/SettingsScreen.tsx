@@ -62,11 +62,13 @@ export default function SettingsScreen() {
   const handleUpdateTimeframe = async (timeframe: TimeframeOption) => {
     await updateSetting('defaultTimeframe', timeframe);
     await loadSettings();
+    Alert.alert('Success', `Default timeframe updated to ${timeframe}`);
   };
 
   const handleUpdatePollingInterval = async (interval: PollingInterval) => {
     await updateSetting('pollingInterval', interval);
     await loadSettings();
+    Alert.alert('Success', `Refresh rate updated to ${interval / 1000} seconds`);
   };
 
   const handleAddAlert = () => {
@@ -210,6 +212,9 @@ export default function SettingsScreen() {
           
           <View style={styles.settingCard}>
             <Text style={styles.settingLabel}>Default Timeframe</Text>
+            <Text style={styles.settingDescription}>
+              Default chart interval when opening charts (currently experimental)
+            </Text>
             <View style={styles.chipContainer}>
               {TIMEFRAME_OPTIONS.map((tf) => (
                 <TouchableOpacity
@@ -235,6 +240,9 @@ export default function SettingsScreen() {
 
           <View style={[styles.settingCard, { marginTop: 12 }]}>
             <Text style={styles.settingLabel}>Data Refresh Rate</Text>
+            <Text style={styles.settingDescription}>
+              Polling interval for price updates (when WebSocket unavailable)
+            </Text>
             <View style={styles.chipContainer}>
               {POLLING_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -314,7 +322,7 @@ export default function SettingsScreen() {
               <View style={styles.settingInfo}>
                 <Text style={styles.settingLabel}>Push Notifications</Text>
                 <Text style={styles.settingDescription}>
-                  Receive alerts when price targets are hit
+                  Receive alerts when price targets are hit (coming soon)
                 </Text>
               </View>
               <Switch
@@ -331,7 +339,7 @@ export default function SettingsScreen() {
               <View style={styles.settingInfo}>
                 <Text style={styles.settingLabel}>Sound Alerts</Text>
                 <Text style={styles.settingDescription}>
-                  Play sound when alerts trigger
+                  Play sound when alerts trigger (coming soon)
                 </Text>
               </View>
               <Switch
@@ -341,6 +349,12 @@ export default function SettingsScreen() {
                 thumbColor={'#FFFFFF'}
               />
             </View>
+          </View>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.infoText}>
+              ℹ️ Price alert monitoring requires background service. This feature will be activated in a future update.
+            </Text>
           </View>
         </View>
 
@@ -626,5 +640,18 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  infoCard: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  infoText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
 });
