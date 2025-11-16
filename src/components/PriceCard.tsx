@@ -13,7 +13,7 @@ import { useTicker, useKlines, marketDataManager } from '../market/MarketDataMan
 import Skeleton from './Skeleton';
 
 interface PriceCardProps {
-  onPress?: () => void; // Navigate to full chart screen
+  onPress?: () => void;
 }
 
 const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
@@ -24,12 +24,10 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<any>(null);
   const lastTickRef = useRef<number>(0);
-  // Removed local WebSocket; now using shared MarketDataManager
   const ticker = useTicker('BTCUSDT');
   const latestKline = useKlines('1m', 'BTCUSDT');
-  // Smooth professional update animation: subtle fade + slide
   const changeAnim = useRef(new Animated.Value(0)).current;
-  const [priceHistory, setPriceHistory] = useState<number[]>([]); // sliding sparkline data
+  const [priceHistory, setPriceHistory] = useState<number[]>([]);
 
   // Fetch initial candles
   const loadCandles = useCallback(async () => {
@@ -44,7 +42,6 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
         setCurrentPrice(latest.close);
         setPriceHistory(data.slice(-120).map(c => c.close));
         
-        // Calculate 24h change (144 candles * 1m ~ 2h, but we have only 3h). Use REST ticker for accurate 24h below as fallback.
         if (data.length >= 1440) {
           const dayAgo = data[data.length - 1440];
           const change = ((latest.close - dayAgo.close) / dayAgo.close) * 100;
@@ -102,20 +99,15 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
     }
   }, [ticker, changeAnim]);
 
-  //// Initial data load handled below together with WebSocket connect
-
-  // Connect WebSocket + initial data
   useEffect(() => {
-    // initial REST seed
     loadCandles();
     marketDataManager.setDebug(false);
   }, [loadCandles]);
 
-  // Polling fallback for stale data
   useEffect(() => {
     pollRef.current = setInterval(() => {
       const staleFor = Date.now() - (lastTickRef.current || 0);
-      if (staleFor > 15000) { // fallback only if shared WS stalled
+      if (staleFor > 15000) {
         fetchTicker24h('BTCUSDT').then(t => {
           setCurrentPrice(t.price);
           setPriceChange(t.priceChange);
@@ -131,15 +123,12 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
   }, []);
 
   const priceColor = priceChange >= 0 ? '#10B981' : '#EF4444';
-  const priceIcon = priceChange >= 0 ? '📈' : '📉';
   const changeBadgeStyle = useMemo(() => ({
     backgroundColor: priceChange >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
     borderColor: priceChange >= 0 ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.35)',
   }), [priceChange]);
 
-  // Extract close prices for simple chart
   const closePrices = useMemo(() => priceHistory, [priceHistory]);
-  // Locale-aware formatted price to match design ($103.807,19)
   const formattedPrice = useMemo(
     () =>
       Number.isFinite(currentPrice)
@@ -200,7 +189,6 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
         <Text style={styles.price}>${formattedPrice}</Text>
       </Animated.View>
 
-      {/* Simple SVG Chart */}
       {closePrices.length > 0 && (
         <View style={styles.chartContainer}>
       <SimplePriceChart data={closePrices} height={80} color={priceColor} smooth />

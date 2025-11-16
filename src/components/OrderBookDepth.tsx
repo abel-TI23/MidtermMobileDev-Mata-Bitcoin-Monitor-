@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { colors } from '../theme';
 import { useWebSocketCleanup } from '../hooks/useWebSocketCleanup';
 
@@ -17,13 +17,13 @@ interface OrderBookLevel {
 interface OrderBookDepthProps {
   symbol?: string;
   levels?: number; // Number of price levels to display (default: 10)
-  minOrderSize?: number; // Minimum BTC order size to display (default: 5 BTC)
+  minOrderSize?: number; // Minimum BTC order size to display (default: 0 = show all)
 }
 
 export function OrderBookDepth({ 
   symbol = 'BTCUSDT', 
   levels = 10,
-  minOrderSize = 0, // Show all orders (no minimum filter)
+  minOrderSize = 0.1, // Default 0.1 BTC minimum
 }: OrderBookDepthProps) {
   const [bids, setBids] = useState<OrderBookLevel[]>([]);
   const [asks, setAsks] = useState<OrderBookLevel[]>([]);
@@ -31,6 +31,7 @@ export function OrderBookDepth({
   const [totalAskQty, setTotalAskQty] = useState<number>(0);
   const [spread, setSpread] = useState<number>(0);
   const [filteredCount, setFilteredCount] = useState<number>(0);
+  const [userMinSize, setUserMinSize] = useState<number>(minOrderSize); // User-controlled size
   const wsRef = useRef<WebSocket | null>(null);
 
   // Function to connect WebSocket
@@ -53,11 +54,11 @@ export function OrderBookDepth({
       if (data.bids && data.asks) {
         let filtered = 0;
 
-        // Filter bids based on minOrderSize (0 = show all)
+        // Filter bids based on userMinSize
         const filteredBids = data.bids
           .filter((b: string[]) => {
             const qty = parseFloat(b[1]);
-            if (minOrderSize > 0 && qty < minOrderSize) {
+            if (userMinSize > 0 && qty < userMinSize) {
               filtered++;
               return false;
             }
@@ -69,11 +70,11 @@ export function OrderBookDepth({
             quantity: b[1],
           }));
         
-        // Filter asks based on minOrderSize (0 = show all)
+        // Filter asks based on userMinSize
         const filteredAsks = data.asks
           .filter((a: string[]) => {
             const qty = parseFloat(a[1]);
-            if (minOrderSize > 0 && qty < minOrderSize) {
+            if (userMinSize > 0 && qty < userMinSize) {
               filtered++;
               return false;
             }
@@ -111,7 +112,7 @@ export function OrderBookDepth({
     ws.onclose = () => {
       console.log('OrderBook WebSocket closed');
     };
-  }, [symbol, levels, minOrderSize]);
+  }, [symbol, levels, userMinSize]);
 
   // Memory leak prevention: Auto cleanup on unmount and app background
   useWebSocketCleanup(wsRef, connectWebSocket);
@@ -140,16 +141,38 @@ export function OrderBookDepth({
     ? ((totalBidQty - totalAskQty) / (totalBidQty + totalAskQty)) * 100 
     : 0;
 
+  // Size options for user to choose from (0.1 to 1.0 BTC)
+  const sizeOptions = [0.1, 0.25, 0.5, 0.75, 1.0];
+
   return (
     <View style={styles.container}>
-      {/* Header with Optional Filter Badge */}
+      {/* Header with Size Selector */}
       <View style={styles.headerRow}>
         <Text style={styles.title}>Order Book Depth</Text>
-        {minOrderSize > 0 && (
-          <View style={styles.filterBadge}>
-            <Text style={styles.filterText}>≥{minOrderSize} BTC</Text>
-          </View>
-        )}
+      </View>
+
+      {/* Size Selector Pills */}
+      <View style={styles.sizeSelector}>
+        <Text style={styles.sizeLabel}>Min Size:</Text>
+        {sizeOptions.map(size => (
+          <Pressable
+            key={size}
+            style={[
+              styles.sizePill,
+              userMinSize === size && styles.sizePillActive,
+            ]}
+            onPress={() => setUserMinSize(size)}
+          >
+            <Text
+              style={[
+                styles.sizePillText,
+                userMinSize === size && styles.sizePillTextActive,
+              ]}
+            >
+              {size}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
       {/* Header Stats */}
@@ -220,14 +243,12 @@ export function OrderBookDepth({
         </View>
       </View>
 
-      {/* Info Box - Only show if filtering */}
-      {minOrderSize > 0 && (
-        <View style={styles.infoBox}>
-          <Text style={styles.infoText}>
-            🎯 Tracking institutional orders ≥{minOrderSize} BTC
-          </Text>
-        </View>
-      )}
+      {/* Info Box */}
+      <View style={styles.infoBox}>
+        <Text style={styles.infoText}>
+          🎯 Showing orders ≥{userMinSize} BTC
+        </Text>
+      </View>
     </View>
   );
 }
@@ -248,6 +269,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: colors.textPrimary,
+  },
+  sizeSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 6,
+  },
+  sizeLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted,
+    marginRight: 4,
+  },
+  sizePill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: '#374151',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  sizePillActive: {
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    borderColor: '#3B82F6',
+  },
+  sizePillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.textSecondary,
+  },
+  sizePillTextActive: {
+    color: '#3B82F6',
   },
   filterBadge: {
     backgroundColor: 'rgba(34, 197, 94, 0.2)',

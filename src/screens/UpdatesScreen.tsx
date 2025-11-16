@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, A
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme';
-import { FeedItem, FeedSource, DEFAULT_TWITTER_ACCOUNTS, DEFAULT_YOUTUBE_CHANNELS } from '../types/feed';
+import { FeedItem, FeedSource, DEFAULT_YOUTUBE_CHANNELS } from '../types/feed';
 import { FeedCard } from '../components/FeedCard';
 import { TwitterTimeline } from '../components/TwitterTimeline';
 import { aggregateFeeds } from '../utils/feedParser';
@@ -149,13 +149,10 @@ export default function UpdatesScreen() {
               {/* Twitter Timeline Section */}
               {selectedFilter === 'twitter' ? (
                 <View style={styles.twitterSection}>
-                  <Text style={styles.sectionTitle}>Twitter / X</Text>
-                  <Text style={styles.sectionSubtitle}>Latest from crypto experts</Text>
-                  {FEATURED_TWITTER_ACCOUNTS.map((account, index) => (
-                    <View key={index} style={styles.tweetItem}>
-                      <Text style={styles.tweetAuthor}>@{account.username} · {account.category}</Text>
-                      <TwitterTimeline username={account.username} tweetLimit={3} height={400} />
-                    </View>
+                  <Text style={styles.sectionTitle}>Rekomendasi Akun Twitter/X</Text>
+                  <Text style={styles.sectionSubtitle}>Pilih akun favorit dan buka langsung di Twitter atau X</Text>
+                  {FEATURED_TWITTER_ACCOUNTS.map(account => (
+                    <TwitterTimeline key={account.username} account={account} />
                   ))}
                 </View>
               ) : null}
@@ -181,7 +178,7 @@ export default function UpdatesScreen() {
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>
-                Sources: Twitter/X (official embed), The Block, CoinDesk, Bloomberg Markets, Coinvestasi, YouTube RSS
+                Sources: Rekomendasi akun Twitter/X, The Block, CoinDesk, Bloomberg Markets, Coinvestasi, YouTube RSS
               </Text>
               <Text style={styles.footerSubtext}>
                 Last updated: {new Date().toLocaleTimeString()}
@@ -302,15 +299,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textMuted,
     marginBottom: 12,
-  },
-  tweetItem: {
-    marginBottom: 12,
-  },
-  tweetAuthor: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1DA1F2',
-    marginBottom: 6,
   },
   emptyState: {
     backgroundColor: 'rgba(59, 130, 246, 0.1)',

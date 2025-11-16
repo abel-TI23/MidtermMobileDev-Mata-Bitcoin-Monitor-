@@ -1,161 +1,121 @@
 /**
- * TwitterTimeline - Display Twitter account timeline using official embed widget
- * Shows the latest tweets from a specific account
+ * TwitterTimeline - Lightweight card to recommend Twitter accounts
  */
 
-import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, ActivityIndicator, Linking, Text } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking } from 'react-native';
 import { colors } from '../theme';
+import { FeaturedTwitterAccount } from '../config/twitterFeeds';
 
 interface TwitterTimelineProps {
-  username: string; // Twitter username without @
-  tweetLimit?: number; // Number of tweets to display (default: 5)
-  height?: number; // Height of the timeline (default: 500)
+  account: FeaturedTwitterAccount;
+  onVisit?: (username: string) => void;
 }
 
-export function TwitterTimeline({ 
-  username, 
-  tweetLimit = 5,
-  height = 500,
-}: TwitterTimelineProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          body {
-            background-color: #000000;
-            overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          }
-          .timeline-container {
-            width: 100%;
-            min-height: 100vh;
-          }
-          /* Hide scrollbar but keep functionality */
-          ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="timeline-container">
-          <a class="twitter-timeline"
-             data-theme="dark"
-             data-chrome="noheader nofooter noborders transparent"
-             data-tweet-limit="${tweetLimit}"
-             data-dnt="true"
-             href="https://twitter.com/${username}">
-            Loading tweets from @${username}...
-          </a>
-        </div>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </body>
-    </html>
-  `;
-
-  const handleNavigationStateChange = useCallback((navState: any) => {
-    // Open external links in browser
-    if (navState.url && !navState.url.includes('about:blank')) {
-      const twitterDomains = ['twitter.com', 'x.com', 't.co'];
-      const isTwitterLink = twitterDomains.some(domain => navState.url.includes(domain));
-      
-      if (isTwitterLink && navState.navigationType === 'click') {
-        Linking.openURL(navState.url);
-        return false;
-      }
+export function TwitterTimeline({ account, onVisit }: TwitterTimelineProps) {
+  const handleVisit = () => {
+    const url = `https://twitter.com/${account.username}`;
+    Linking.openURL(url).catch(() => {
+      // No-op when the device cannot handle the URL
+    });
+    if (onVisit) {
+      onVisit(account.username);
     }
-    return true;
-  }, []);
+  };
 
   return (
-    <View style={[styles.container, { height }]}>
-      {loading && !error && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.accent} />
+    <Pressable style={({ pressed }) => [styles.card, pressed && styles.cardPressed]} onPress={handleVisit}>
+      <View style={styles.headerRow}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{account.name.charAt(0).toUpperCase()}</Text>
         </View>
-      )}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>Couldn’t load Twitter/X</Text>
-          <Text style={styles.errorText}>Content may be blocked by network or region. Tap to open in browser.</Text>
-          <Text
-            style={styles.errorLink}
-            onPress={() => Linking.openURL(`https://twitter.com/${username}`)}
-          >
-            Open @${username}
-          </Text>
+        <View style={styles.meta}>
+          <Text style={styles.name}>{account.name}</Text>
+          <Text style={styles.username}>@{account.username}</Text>
         </View>
-      )}
-      <WebView
-        source={{ html }}
-        style={styles.webview}
-        onLoadEnd={() => setLoading(false)}
-        onError={() => { setLoading(false); setError('Failed'); }}
-        onShouldStartLoadWithRequest={handleNavigationStateChange}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={false}
-        scrollEnabled={true}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        androidLayerType="hardware"
-        mixedContentMode="compatibility"
-        nestedScrollEnabled
-      />
-    </View>
+      </View>
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{account.category}</Text>
+      </View>
+      {account.description ? (
+        <Text style={styles.description}>{account.description}</Text>
+      ) : null}
+      <Text style={styles.cta}>Buka di Twitter/X</Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    backgroundColor: '#000000',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginVertical: 8,
+  card: {
+    backgroundColor: '#111827',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.15)',
+    marginBottom: 12,
   },
-  webview: {
+  cardPressed: {
+    opacity: 0.85,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#1F2937',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  avatarText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  meta: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
-  loadingContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000000',
-    zIndex: 1,
+  name: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textPrimary,
   },
-  errorContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    backgroundColor: '#000000',
-    zIndex: 2,
+  username: {
+    fontSize: 13,
+    color: colors.textMuted,
+    marginTop: 2,
   },
-  errorTitle: { color: '#fff', fontWeight: '700', marginBottom: 6 },
-  errorText: { color: '#9CA3AF', fontSize: 12, textAlign: 'center' },
-  errorLink: { color: '#3B82F6', fontWeight: '700', marginTop: 10 },
+  badge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#3B82F6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  description: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 18,
+  },
+  cta: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#3B82F6',
+    marginTop: 16,
+  },
 });
 
 export default TwitterTimeline;
