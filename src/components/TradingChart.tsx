@@ -1,11 +1,10 @@
 /**
  * TradingChart Component
- * Candlestick/line chart with tap interaction and pinch-to-zoom
+ * Candlestick/line chart with tap interaction and zoom controls
  */
 
-import React, { useMemo, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableWithoutFeedback, GestureResponderEvent } from 'react-native';
-import { GestureHandlerRootView, PinchGestureHandler, State } from 'react-native-gesture-handler';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableWithoutFeedback, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import Svg, { Line, Rect, G, Text as SvgText } from 'react-native-svg';
 import { Candle } from '../utils/binanceAPI';
 import { colors } from '../theme';
@@ -30,9 +29,8 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const marginTop = 20;
   const marginBottom = 50;
 
-  // Zoom state
+  // Zoom state with button controls
   const [visibleCandleCount, setVisibleCandleCount] = useState(50);
-  const baseScale = useRef(1);
 
   // Show last N candles based on zoom level
   const visibleCount = Math.min(visibleCandleCount, candles.length);
@@ -40,6 +38,11 @@ const TradingChart: React.FC<TradingChartProps> = ({
     if (candles.length <= visibleCount) return candles;
     return candles.slice(-visibleCount);
   }, [candles, visibleCount]);
+
+  // Zoom functions
+  const zoomIn = () => setVisibleCandleCount(prev => Math.max(20, prev - 10));
+  const zoomOut = () => setVisibleCandleCount(prev => Math.min(100, prev + 10));
+  const resetZoom = () => setVisibleCandleCount(50);
 
   // Price range
   const priceRange = useMemo(() => {
@@ -120,19 +123,6 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const selectedCandle = crossIndex !== null ? visibleCandles[crossIndex] : null;
   const livePrice = currentPrice ?? (candles.length ? candles[candles.length - 1].close : null);
 
-  // Pinch-to-zoom handler
-  const onPinchEvent = (event: any) => {
-    if (event.nativeEvent.state === State.ACTIVE) {
-      const scale = event.nativeEvent.scale;
-      // Zoom in = fewer candles (min 20), Zoom out = more candles (max 100)
-      const newCount = Math.round(50 / scale);
-      const clampedCount = Math.max(20, Math.min(100, newCount));
-      setVisibleCandleCount(clampedCount);
-    } else if (event.nativeEvent.state === State.END) {
-      baseScale.current = 1;
-    }
-  };
-
   const selectedMetrics = useMemo(() => {
     if (!selectedCandle) return null;
     const change = selectedCandle.close - selectedCandle.open;
@@ -166,7 +156,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
   const minPrice = Math.min(...visibleCandles.map(c => c.low));
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       {/* Floating Tooltip Overlay */}
       {selectedCandle && selectedMetrics && (
         <View style={styles.floatingTooltip} pointerEvents="none">
@@ -183,12 +173,21 @@ const TradingChart: React.FC<TradingChartProps> = ({
 
       <View style={styles.headerRow}>
         <Text style={styles.title}>Price Chart</Text>
-        <Text style={styles.hint}>👆 Tap • 🤏 Pinch to zoom</Text>
+        <View style={styles.zoomControls}>
+          <TouchableOpacity onPress={zoomIn} style={styles.zoomButton}>
+            <Text style={styles.zoomButtonText}>🔍+</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={resetZoom} style={styles.zoomButtonReset}>
+            <Text style={styles.zoomButtonTextSmall}>{visibleCandleCount}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={zoomOut} style={styles.zoomButton}>
+            <Text style={styles.zoomButtonText}>🔍−</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <PinchGestureHandler onGestureEvent={onPinchEvent} onHandlerStateChange={onPinchEvent}>
-        <TouchableWithoutFeedback onPress={handlePress}>
-          <View>
+      <TouchableWithoutFeedback onPress={handlePress}>
+        <View>
           <Svg width={chartWidth} height={chartHeight}>
           {/* Horizontal grid & y-axis */}
           <G>
@@ -258,9 +257,8 @@ const TradingChart: React.FC<TradingChartProps> = ({
             <SvgText key={i} x={l.x} y={chartHeight - 25} fill={colors.textMuted} fontSize={10} textAnchor="middle">{l.text}</SvgText>
           ))}
         </Svg>
-        </View>
+      </View>
       </TouchableWithoutFeedback>
-      </PinchGestureHandler>
 
       {/* Legend */}
       <View style={styles.legendContainer}>
@@ -298,8 +296,8 @@ const TradingChart: React.FC<TradingChartProps> = ({
           <SvgText key={i} x={l.x} y={volumeHeight - 10} fill={colors.textMuted} fontSize={10} textAnchor="middle">{l.text}</SvgText>
         ))}
       </Svg>
-      <Text style={styles.footnote}>Last {visibleCandles.length} candles • Tap for details • Pinch to zoom (20-100) • Real-time updates</Text>
-    </GestureHandlerRootView>
+      <Text style={styles.footnote}>Last {visibleCandles.length} candles • Tap for details • Use 🔍 buttons to zoom (20-100) • Real-time updates</Text>
+    </View>
   );
 };
 
@@ -328,11 +326,38 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
-  hint: {
-    color: colors.textMuted,
+  zoomControls: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
+  },
+  zoomButton: {
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+  },
+  zoomButtonReset: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    minWidth: 32,
+    alignItems: 'center',
+  },
+  zoomButtonText: {
+    color: '#3B82F6',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  zoomButtonTextSmall: {
+    color: '#A78BFA',
     fontSize: 11,
-    fontWeight: '600',
-    fontStyle: 'italic',
+    fontWeight: '700',
   },
   floatingTooltip: {
     position: 'absolute',
