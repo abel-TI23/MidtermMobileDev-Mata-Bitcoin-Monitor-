@@ -212,7 +212,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
                 const color = isUp ? '#22C55E' : '#EF4444';
                 const bodyTop = Math.min(openY, closeY);
                 const bodyHeight = Math.max(1, Math.abs(closeY - openY));
-                const candleWidth = 10; // Increased from 6px
+                const candleWidth = 4; // Increased from 6px
                 return (
                   <G key={i}>
                     <Line x1={x} y1={highY} x2={x} y2={lowY} stroke={color} strokeWidth={1.5} />
@@ -243,8 +243,9 @@ const TradingChart: React.FC<TradingChartProps> = ({
           {livePrice != null && (
             <G>
               <Line x1={marginLeft} y1={toY(livePrice)} x2={chartWidth - marginRight} y2={toY(livePrice)} stroke="#F59E0B" strokeWidth={2} strokeDasharray="5,5" />
-              <Rect x={chartWidth - marginRight + 5} y={toY(livePrice) - 14} width={70} height={28} fill="#F59E0B" rx={4} />
-              <SvgText x={chartWidth - marginRight + 40} y={toY(livePrice) + 5} fill="#000" fontSize={13} fontWeight="700" textAnchor="middle">{livePrice.toFixed(2)}</SvgText>
+              {/* Price label in center */}
+              <Rect x={(chartWidth / 2) - 40} y={toY(livePrice) - 14} width={80} height={28} fill="#F59E0B" rx={4} />
+              <SvgText x={chartWidth / 2} y={toY(livePrice) + 5} fill="#000" fontSize={13} fontWeight="700" textAnchor="middle">{livePrice.toFixed(2)}</SvgText>
             </G>
           )}
 
@@ -287,7 +288,7 @@ const TradingChart: React.FC<TradingChartProps> = ({
             const fill = isUp ? '#22C55E' : '#EF4444';
             const y = toVolumeY(c.volume);
             const barH = volumeHeight - 40 - y + 20;
-            const barWidth = 8; // Increased from 5px
+            const barWidth = 4; // Increased from 5px
             return <Rect key={i} x={x - barWidth/2} y={y} width={barWidth} height={Math.max(1, barH)} fill={fill} opacity={0.8} />;
           })}
         </G>
