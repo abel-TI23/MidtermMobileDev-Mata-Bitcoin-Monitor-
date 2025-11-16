@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import TradingChartSkia from '../components/TradingChartSkia';
+import TradingChart from '../components/TradingChart';
 import { fetchCandles, Candle } from '../utils/binanceAPI';
 
 type Interval = '1m' | '5m' | '15m' | '1h' | '4h' | '1d';
@@ -91,12 +91,8 @@ const ChartScreen: React.FC = () => {
           <ActivityIndicator size="large" color="#3b82f6" />
         </View>
       ) : (
-        <TradingChartSkia
+        <TradingChart
           candles={candles}
-          ema21={[]}
-          sma100={[]}
-          showEMA={false}
-          showSMA={false}
           currentPrice={currentPrice}
           chartType="candle"
         />

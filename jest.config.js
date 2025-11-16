@@ -3,8 +3,6 @@ module.exports = {
   // Ignore non-RN subprojects during RN test runs
   testPathIgnorePatterns: [
     '/node_modules/',
-    '<rootDir>/binance-ws-proxy/',
-    '<rootDir>/server-proxy/',
     '<rootDir>/cloudflare/',
   ],
   // Ensure ESM packages in node_modules get transformed
