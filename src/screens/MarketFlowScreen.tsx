@@ -8,7 +8,7 @@ import { LongShortRatio } from '../components/LongShortRatio';
 import { LiquidationTracker } from '../components/LiquidationTracker';
 import { OpenInterest } from '../components/OpenInterest';
 import { FundingRate } from '../components/FundingRate';
-import { OrderBookHeatmap } from '../components/OrderBookHeatmap';
+import { VWAPIndicator } from '../components/VWAPIndicator';
 
 export default function MarketFlowScreen() {
   return (
@@ -55,10 +55,10 @@ export default function MarketFlowScreen() {
           <FundingRate symbol="BTCUSDT" />
         </View>
 
-        {/* Order Book Heatmap */}
+        {/* VWAP Indicator */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Order Book Heatmap</Text>
-          <OrderBookHeatmap symbol="BTCUSDT" bucketSize={50} numLevels={25} minOrderSize={0.1} />
+          <Text style={styles.sectionTitle}>VWAP Indicator</Text>
+          <VWAPIndicator symbol="BTCUSDT" />
         </View>
 
         {/* Real-time Updates Info */}
@@ -74,7 +74,7 @@ export default function MarketFlowScreen() {
             <Text style={styles.bulletPoint}>• Liquidations: Real-time feed</Text>
             <Text style={styles.bulletPoint}>• Open Interest: Real-time tracking</Text>
             <Text style={styles.bulletPoint}>• Funding Rate: 5-minute refresh (updates every 8h)</Text>
-            <Text style={styles.bulletPoint}>• Heatmap: Real-time order concentration (≥0.5 BTC, $50 levels)</Text>
+            <Text style={styles.bulletPoint}>• VWAP: Institutional trading benchmark (24h rolling)</Text>
           </View>
         </View>
 

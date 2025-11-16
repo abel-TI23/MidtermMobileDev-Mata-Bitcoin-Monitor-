@@ -23,7 +23,7 @@ interface OrderBookDepthProps {
 export function OrderBookDepth({ 
   symbol = 'BTCUSDT', 
   levels = 10,
-  minOrderSize = 0.1, // Default 0.1 BTC minimum
+  minOrderSize = 0, // Default 0.1 BTC minimum
 }: OrderBookDepthProps) {
   const [bids, setBids] = useState<OrderBookLevel[]>([]);
   const [asks, setAsks] = useState<OrderBookLevel[]>([]);
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
     padding: 8,
-    height: 480, // Fixed height to prevent jumping
+    height: 600, // Fixed height to prevent jumping
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -352,11 +352,11 @@ const styles = StyleSheet.create({
   },
   asksSection: {
     marginBottom: 4,
-    height: 200, // Fixed height for asks section
+    height: 260, // Fixed height for asks section
   },
   bidsSection: {
     marginTop: 4,
-    height: 200, // Fixed height for bids section
+    height: 260, // Fixed height for bids section
   },
   bookRow: {
     flexDirection: 'row',

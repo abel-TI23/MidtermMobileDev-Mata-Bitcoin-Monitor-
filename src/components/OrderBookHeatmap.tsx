@@ -25,14 +25,13 @@ interface OrderBookHeatmapProps {
 
 export function OrderBookHeatmap({ 
   symbol = 'BTCUSDT',
-  bucketSize = 50,
+  bucketSize = 50, // Not used anymore but kept for interface
   numLevels = 25,
-  minOrderSize = 0.1, // Lower threshold - 0.1 BTC minimum
+  minOrderSize = 0.1, // Not used anymore but kept for interface
 }: OrderBookHeatmapProps) {
   const [priceLevels, setPriceLevels] = useState<PriceLevel[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [maxSize, setMaxSize] = useState<number>(0);
-  const [filteredOrderCount, setFilteredOrderCount] = useState<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
 
   // Fetch current price (extracted as useCallback)
@@ -48,81 +47,61 @@ export function OrderBookHeatmap({
     }
   }, [symbol]);
 
-  // Aggregate order book with configurable filter
+  // Process raw order book data WITHOUT bucketing - show ALL data
   const aggregateOrderBook = useCallback((bids: string[][], asks: string[][]) => {
-    const buckets: Map<number, PriceLevel> = new Map();
-    let filteredCount = 0;
+    console.log(`[Heatmap] Raw data received - Bids: ${bids.length}, Asks: ${asks.length}`);
+    
+    const levels: PriceLevel[] = [];
 
-    console.log(`[Heatmap] Processing ${bids.length} bids, ${asks.length} asks, minSize: ${minOrderSize}`);
-
-    // Process bids (support levels)
-    bids.forEach(([priceStr, sizeStr]) => {
+    // Take top N bids directly (no bucketing, no filtering)
+    const topBids = bids.slice(0, numLevels);
+    topBids.forEach(([priceStr, sizeStr]) => {
       const price = parseFloat(priceStr);
       const size = parseFloat(sizeStr);
       
-      // Filter: only track orders >= minOrderSize BTC
-      if (minOrderSize > 0 && size < minOrderSize) {
-        filteredCount++;
-        return;
-      }
-      
-      const bucketPrice = Math.floor(price / bucketSize) * bucketSize;
-
-      if (!buckets.has(bucketPrice)) {
-        buckets.set(bucketPrice, {
-          price: bucketPrice,
-          bidSize: 0,
-          askSize: 0,
-          totalSize: 0,
-        });
-      }
-
-      const bucket = buckets.get(bucketPrice)!;
-      bucket.bidSize += size;
-      bucket.totalSize += size;
+      levels.push({
+        price: price,
+        bidSize: size,
+        askSize: 0,
+        totalSize: size,
+      });
     });
 
-    // Process asks (resistance levels)
-    asks.forEach(([priceStr, sizeStr]) => {
+    // Take top N asks directly (no bucketing, no filtering)
+    const topAsks = asks.slice(0, numLevels);
+    topAsks.forEach(([priceStr, sizeStr]) => {
       const price = parseFloat(priceStr);
       const size = parseFloat(sizeStr);
       
-      // Filter: only track orders >= minOrderSize BTC
-      if (minOrderSize > 0 && size < minOrderSize) {
-        filteredCount++;
-        return;
-      }
-      
-      const bucketPrice = Math.floor(price / bucketSize) * bucketSize;
-
-      if (!buckets.has(bucketPrice)) {
-        buckets.set(bucketPrice, {
-          price: bucketPrice,
+      // Find if we already have this price level
+      const existingLevel = levels.find(l => l.price === price);
+      if (existingLevel) {
+        existingLevel.askSize = size;
+        existingLevel.totalSize += size;
+      } else {
+        levels.push({
+          price: price,
           bidSize: 0,
-          askSize: 0,
-          totalSize: 0,
+          askSize: size,
+          totalSize: size,
         });
       }
-
-      const bucket = buckets.get(bucketPrice)!;
-      bucket.askSize += size;
-      bucket.totalSize += size;
     });
 
-    // Convert to array and sort by price
-    const levels = Array.from(buckets.values())
-      .filter(level => level.totalSize > 0) // Only show levels with orders
-      .sort((a, b) => b.price - a.price)
-      .slice(0, numLevels);
+    // Sort by price descending
+    levels.sort((a, b) => b.price - a.price);
 
-    console.log(`[Heatmap] Result: ${levels.length} levels, filtered: ${filteredCount}, maxSize: ${Math.max(...levels.map(l => l.totalSize), 0).toFixed(2)}`);
+    console.log(`[Heatmap] Final result: ${levels.length} levels`);
+    if (levels.length > 0) {
+      console.log(`[Heatmap] Sample: $${levels[0].price.toFixed(2)} - Bid: ${levels[0].bidSize.toFixed(4)}, Ask: ${levels[0].askSize.toFixed(4)}`);
+    }
 
     // Find max size for normalization
-    const max = Math.max(...levels.map((l) => l.totalSize), 1); // Prevent division by zero
+    const max = Math.max(...levels.map((l) => l.totalSize), 1);
+    
     setMaxSize(max);
     setPriceLevels(levels);
-    setFilteredOrderCount(filteredCount);
-  }, [bucketSize, numLevels, minOrderSize]);
+  }, [numLevels]);
 
   // Connect WebSocket
   const connectWebSocket = useCallback(() => {
@@ -131,15 +110,25 @@ export function OrderBookHeatmap({
       wsRef.current = null;
     }
 
+    console.log(`[Heatmap] Connecting to WebSocket for ${symbol}...`);
     const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@depth20@100ms`);
     wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('[Heatmap] WebSocket connected successfully');
+    };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         
+        console.log('[Heatmap] WebSocket message received');
+        
         if (data.b && data.a) {
+          console.log(`[Heatmap] Data has bids and asks arrays`);
           aggregateOrderBook(data.b, data.a);
+        } else {
+          console.log('[Heatmap] Data missing b or a arrays:', Object.keys(data));
         }
       } catch (error) {
         console.error('Error processing orderbook data:', error);
@@ -147,7 +136,11 @@ export function OrderBookHeatmap({
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error('[Heatmap] WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('[Heatmap] WebSocket closed');
     };
   }, [symbol, aggregateOrderBook]);
 
@@ -207,10 +200,7 @@ export function OrderBookHeatmap({
         <Text style={styles.title}>Order Book Heatmap</Text>
         <View style={styles.headerBadges}>
           <View style={styles.infoBadge}>
-            <Text style={styles.infoText}>${bucketSize} levels</Text>
-          </View>
-          <View style={[styles.infoBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
-            <Text style={[styles.infoText, { color: '#22C55E' }]}>≥{minOrderSize.toFixed(1)} BTC</Text>
+            <Text style={styles.infoText}>Top {numLevels} levels</Text>
           </View>
         </View>
       </View>
@@ -230,7 +220,7 @@ export function OrderBookHeatmap({
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>⏳ Loading heatmap data...</Text>
           <Text style={styles.emptySubtext}>
-            Tracking orders ≥ {minOrderSize} BTC
+            Connecting to Binance WebSocket
           </Text>
         </View>
       ) : (
@@ -301,10 +291,10 @@ export function OrderBookHeatmap({
       )}
 
       <View style={styles.infoBox}>
-        <Text style={styles.infoBoxTitle}>Order Concentration Analysis</Text>
+        <Text style={styles.infoBoxTitle}>Order Book Visualization</Text>
         <Text style={styles.infoBoxText}>
-          • Tracking orders ≥ {minOrderSize} BTC at ${bucketSize} price levels{'\n'}
-          • Darker colors = Higher concentration of orders{'\n'}
+          • Real-time depth20 data from Binance{'\n'}
+          • Darker colors = Higher order concentration{'\n'}
           • Green (left) = Buy walls (support){'\n'}
           • Red (right) = Sell walls (resistance){'\n'}
           • Strong levels may act as price magnets or barriers
