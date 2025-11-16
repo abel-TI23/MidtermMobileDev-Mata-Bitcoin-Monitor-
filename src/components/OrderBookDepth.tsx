@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
     padding: 8,
+    height: 480, // Fixed height to prevent jumping
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -351,9 +352,11 @@ const styles = StyleSheet.create({
   },
   asksSection: {
     marginBottom: 4,
+    height: 200, // Fixed height for asks section
   },
   bidsSection: {
     marginTop: 4,
+    height: 200, // Fixed height for bids section
   },
   bookRow: {
     flexDirection: 'row',

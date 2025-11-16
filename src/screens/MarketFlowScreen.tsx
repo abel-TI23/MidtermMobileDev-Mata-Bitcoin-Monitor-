@@ -58,7 +58,7 @@ export default function MarketFlowScreen() {
         {/* Order Book Heatmap */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Order Book Heatmap</Text>
-          <OrderBookHeatmap symbol="BTCUSDT" bucketSize={50} numLevels={25} minOrderSize={0.5} />
+          <OrderBookHeatmap symbol="BTCUSDT" bucketSize={50} numLevels={25} minOrderSize={0.1} />
         </View>
 
         {/* Real-time Updates Info */}

@@ -25,9 +25,9 @@ interface OrderBookHeatmapProps {
 
 export function OrderBookHeatmap({ 
   symbol = 'BTCUSDT',
-  bucketSize = 100,
-  numLevels = 20,
-  minOrderSize = 0.5, // Filter medium-large orders (0.5+ BTC)
+  bucketSize = 50,
+  numLevels = 25,
+  minOrderSize = 0.1, // Lower threshold - 0.1 BTC minimum
 }: OrderBookHeatmapProps) {
   const [priceLevels, setPriceLevels] = useState<PriceLevel[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -48,18 +48,20 @@ export function OrderBookHeatmap({
     }
   }, [symbol]);
 
-  // Aggregate order book with big player filter
+  // Aggregate order book with configurable filter
   const aggregateOrderBook = useCallback((bids: string[][], asks: string[][]) => {
     const buckets: Map<number, PriceLevel> = new Map();
     let filteredCount = 0;
 
-    // Process bids (support levels) - FILTER for big players
+    console.log(`[Heatmap] Processing ${bids.length} bids, ${asks.length} asks, minSize: ${minOrderSize}`);
+
+    // Process bids (support levels)
     bids.forEach(([priceStr, sizeStr]) => {
       const price = parseFloat(priceStr);
       const size = parseFloat(sizeStr);
       
       // Filter: only track orders >= minOrderSize BTC
-      if (size < minOrderSize) {
+      if (minOrderSize > 0 && size < minOrderSize) {
         filteredCount++;
         return;
       }
@@ -80,13 +82,13 @@ export function OrderBookHeatmap({
       bucket.totalSize += size;
     });
 
-    // Process asks (resistance levels) - FILTER for big players
+    // Process asks (resistance levels)
     asks.forEach(([priceStr, sizeStr]) => {
       const price = parseFloat(priceStr);
       const size = parseFloat(sizeStr);
       
       // Filter: only track orders >= minOrderSize BTC
-      if (size < minOrderSize) {
+      if (minOrderSize > 0 && size < minOrderSize) {
         filteredCount++;
         return;
       }
@@ -112,6 +114,8 @@ export function OrderBookHeatmap({
       .filter(level => level.totalSize > 0) // Only show levels with orders
       .sort((a, b) => b.price - a.price)
       .slice(0, numLevels);
+
+    console.log(`[Heatmap] Result: ${levels.length} levels, filtered: ${filteredCount}, maxSize: ${Math.max(...levels.map(l => l.totalSize), 0).toFixed(2)}`);
 
     // Find max size for normalization
     const max = Math.max(...levels.map((l) => l.totalSize), 1); // Prevent division by zero
