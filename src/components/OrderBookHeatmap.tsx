@@ -20,14 +20,14 @@ interface OrderBookHeatmapProps {
   symbol?: string;
   bucketSize?: number; // Price bucket size (default: $100)
   numLevels?: number; // Number of price levels to show
-  minOrderSize?: number; // Minimum BTC order size to filter (default: 5 BTC)
+  minOrderSize?: number; // Minimum BTC order size to filter (default: 0.5 BTC)
 }
 
 export function OrderBookHeatmap({ 
   symbol = 'BTCUSDT',
   bucketSize = 100,
   numLevels = 20,
-  minOrderSize = 5, // Filter for big players (5+ BTC)
+  minOrderSize = 0.5, // Filter medium-large orders (0.5+ BTC)
 }: OrderBookHeatmapProps) {
   const [priceLevels, setPriceLevels] = useState<PriceLevel[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -190,10 +190,10 @@ export function OrderBookHeatmap({
 
   const getStrengthLabel = (size: number) => {
     const intensity = maxSize > 0 ? size / maxSize : 0;
-    if (intensity > 0.8) return 'Very Strong';
-    if (intensity > 0.6) return 'Strong';
-    if (intensity > 0.4) return 'Moderate';
-    if (intensity > 0.2) return 'Weak';
+    if (intensity > 0.7) return 'Very Strong';
+    if (intensity > 0.5) return 'Strong';
+    if (intensity > 0.3) return 'Moderate';
+    if (intensity > 0.15) return 'Weak';
     return 'Very Weak';
   };
 
@@ -206,7 +206,7 @@ export function OrderBookHeatmap({
             <Text style={styles.infoText}>${bucketSize} levels</Text>
           </View>
           <View style={[styles.infoBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
-            <Text style={[styles.infoText, { color: '#22C55E' }]}>≥{minOrderSize} BTC</Text>
+            <Text style={[styles.infoText, { color: '#22C55E' }]}>≥{minOrderSize.toFixed(1)} BTC</Text>
           </View>
         </View>
       </View>
@@ -297,10 +297,10 @@ export function OrderBookHeatmap({
       )}
 
       <View style={styles.infoBox}>
-        <Text style={styles.infoBoxTitle}>Big Player Tracking</Text>
+        <Text style={styles.infoBoxTitle}>Order Concentration Analysis</Text>
         <Text style={styles.infoBoxText}>
-          • Filtering orders ≥ {minOrderSize} BTC to track institutional movements{'\n'}
-          • Darker colors = Higher concentration of big orders{'\n'}
+          • Tracking orders ≥ {minOrderSize} BTC at ${bucketSize} price levels{'\n'}
+          • Darker colors = Higher concentration of orders{'\n'}
           • Green (left) = Buy walls (support){'\n'}
           • Red (right) = Sell walls (resistance){'\n'}
           • Strong levels may act as price magnets or barriers

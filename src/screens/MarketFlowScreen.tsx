@@ -58,7 +58,7 @@ export default function MarketFlowScreen() {
         {/* Order Book Heatmap */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Order Book Heatmap</Text>
-          <OrderBookHeatmap symbol="BTCUSDT" bucketSize={100} numLevels={20} />
+          <OrderBookHeatmap symbol="BTCUSDT" bucketSize={50} numLevels={25} minOrderSize={0.5} />
         </View>
 
         {/* Real-time Updates Info */}
@@ -74,7 +74,7 @@ export default function MarketFlowScreen() {
             <Text style={styles.bulletPoint}>• Liquidations: Real-time feed</Text>
             <Text style={styles.bulletPoint}>• Open Interest: Real-time tracking</Text>
             <Text style={styles.bulletPoint}>• Funding Rate: 5-minute refresh (updates every 8h)</Text>
-            <Text style={styles.bulletPoint}>• Heatmap: Real-time order concentration at price levels</Text>
+            <Text style={styles.bulletPoint}>• Heatmap: Real-time order concentration (≥0.5 BTC, $50 levels)</Text>
           </View>
         </View>
 
