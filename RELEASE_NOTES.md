@@ -1,4 +1,4 @@
-# Mata - Bitcoin Monitor v1.0.0
+# Mata - Bitcoin Monitor v1.1.0
 
 **Real-time Bitcoin monitoring dengan trading signals, market analysis, dan Settings management**
 
@@ -58,7 +58,7 @@
 
 ---
 
-## 🆕 What's New in v1.0.0
+## 🆕 What's New in v1.1.0
 
 ### Settings Integration (Tier 1 & 2)
 ✅ **Live Features:**
