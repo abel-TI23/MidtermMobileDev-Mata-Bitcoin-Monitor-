@@ -1,6 +1,12 @@
 # Mata - Bitcoin Monitor v1.0.0
 
-**Real-time Bitcoin monitoring dengan trading signals, market analysis, dan multi-source news feeds**
+**Real-time Bitcoin monitoring dengan trading signals, market analysis, dan Settings management**
+
+**Release Date:** November 17, 2025  
+**APK Size:** 22.51 MB  
+**Architecture:** ARM64-v8a
+
+---
 
 ## 🚀 Features
 
@@ -41,9 +47,46 @@
 - **Market Dominance** - BTC dominance tracking
 - **Liquidation Tracker** - Real-time liquidation monitoring
 
-## 📱 Screenshots
+### ⚙️ Settings & Preferences (NEW in v1.0.0!)
+- **Polling Interval Control** - Configurable refresh rates (5s/10s/30s/60s)
+- **Default Timeframe Selection** - Chart preferences (1m to Weekly)
+- **Price Alerts Management** - Create, edit, delete price alerts
+- **Storage Management** - View usage, clear cache utility
+- **Offline Mode Support** - Use cached data when offline
+- **Notification Preferences** - UI ready for future push notifications
+- **Active Alerts Badge** - Visual counter in HomeScreen header
 
-(Coming soon)
+---
+
+## 🆕 What's New in v1.0.0
+
+### Settings Integration (Tier 1 & 2)
+✅ **Live Features:**
+- Polling interval configurable and actively used by app
+- Price alerts CRUD (Create, Read, Update, Delete)
+- Active alerts counter with quick access badge
+- Storage usage monitoring
+- Clear cache functionality
+- Reset to defaults option
+
+✅ **UI Ready (Backend Pending):**
+- Push notification toggles
+- Sound alert preferences  
+- Background price monitoring service
+
+### Chart Improvements
+- Wider candles (10px) for better visibility
+- Optimized candle count (50 default, zoom 20-100)
+- Button-based zoom controls
+- Centered live price label
+
+### Market Flow Updates
+- Fixed OrderBook layout (no more jumping)
+- VWAP Indicator with 24h calculation
+- Signal detection (bullish/bearish/neutral)
+- Auto-refresh every 5 minutes
+
+---
 
 ## 🔧 Technical Stack
 
@@ -105,15 +148,32 @@
 1. **Twitter Embeds**: Beberapa negara memblokir Twitter/X, timeline mungkin tidak load
 2. **WebSocket**: Binance WebSocket mungkin terblokir, app otomatis switch ke polling mode
 3. **Bloomberg Images**: Tidak semua artikel Bloomberg memiliki gambar
+4. **Type Warnings**: TypeScript warnings dari React Navigation (tidak affect runtime)
 
-## 🔮 Planned Features
+---
 
+## 💡 Tips & Tricks
+
+1. **Slow Updates?** → Settings → Ubah refresh rate ke 5 detik
+2. **Can't Connect?** → Aktifkan Cloudflare WARP atau VPN, restart app
+3. **Too Many Candles?** → Gunakan zoom button (🔍−) untuk kurangi jumlah candles
+4. **Storage Penuh?** → Settings → Clear Cache untuk hapus data lama
+5. **Price Alerts?** → Fitur monitoring membutuhkan background service (coming soon)
+
+---
+
+## 🔮 Planned Features (Tier 3)
+
+- [ ] Background service untuk price alert monitoring
+- [ ] Local push notifications
+- [ ] Sound alerts implementation
+- [ ] Light theme support
 - [ ] Portfolio tracking
-- [ ] Price alerts & notifications
 - [ ] Multiple exchange support
 - [ ] DeFi metrics integration
 - [ ] Custom watchlists
-- [ ] Export trading history
+
+---
 
 ## 📄 License
 
