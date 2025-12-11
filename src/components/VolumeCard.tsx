@@ -9,6 +9,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { fetchCandles, Candle } from '../utils/binanceAPI';
 import { useKlines } from '../market/MarketDataManager';
 import Skeleton from './Skeleton';
+import { normalize, spacing, fontSize, borderRadius, hp } from '../utils/responsive';
 
 interface VolumeCardProps {
   onPress?: () => void;
@@ -127,42 +128,42 @@ export function VolumeCard({ onPress, compact = false }: VolumeCardProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#1F2937',
-    borderRadius: 20,
-    padding: 20,
-    marginHorizontal: 16,
-    marginTop: 12,
-    minHeight: 120,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    minHeight: hp(15),
   },
   containerCompact: {
-    marginHorizontal: 8,
-    marginTop: 8,
-    padding: 16,
-    minHeight: 120,
+    marginHorizontal: spacing.sm,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    minHeight: hp(15),
   },
   title: {
     color: '#F9FAFB',
-    fontSize: 16,
+    fontSize: fontSize.lg,
     fontWeight: '700',
     textAlign: 'center',
   },
   valueWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 42,
-    marginTop: 4,
+    minHeight: normalize(42),
+    marginTop: spacing.xs,
   },
   totalVolume: {
     color: '#3B82F6',
-    fontSize: 26,
+    fontSize: fontSize.xxl,
     fontWeight: '700',
   },
   chartWrapper: {
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   helper: {
     color: '#6B7280',
-    fontSize: 12,
-    marginTop: 6,
+    fontSize: fontSize.sm,
+    marginTop: spacing.xs,
     fontWeight: '600',
     textAlign: 'center',
   },

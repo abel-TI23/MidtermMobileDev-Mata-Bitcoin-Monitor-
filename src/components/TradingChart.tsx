@@ -4,10 +4,11 @@
  */
 
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableWithoutFeedback, TouchableOpacity, GestureResponderEvent } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import Svg, { Line, Rect, G, Text as SvgText } from 'react-native-svg';
 import { Candle } from '../utils/binanceAPI';
 import { colors } from '../theme';
+import { useResponsive, normalize, spacing, fontSize } from '../utils/responsive';
 
 interface TradingChartProps {
   candles: Candle[];
@@ -20,14 +21,14 @@ const TradingChart: React.FC<TradingChartProps> = ({
   currentPrice,
   chartType = 'candle',
 }) => {
-  const screenWidth = Dimensions.get('window').width;
+  const { width: screenWidth, hp } = useResponsive();
   const chartWidth = screenWidth; // Full width
-  const chartHeight = 340;
-  const volumeHeight = 120;
-  const marginLeft = 60;
-  const marginRight = 80;
-  const marginTop = 20;
-  const marginBottom = 50;
+  const chartHeight = hp(42); // 42% of screen height
+  const volumeHeight = hp(15); // 15% of screen height
+  const marginLeft = normalize(60);
+  const marginRight = normalize(80);
+  const marginTop = spacing.md;
+  const marginBottom = spacing.xl;
 
   // Zoom state with button controls
   const [visibleCandleCount, setVisibleCandleCount] = useState(50);

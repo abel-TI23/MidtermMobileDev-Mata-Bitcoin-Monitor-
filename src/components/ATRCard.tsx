@@ -9,6 +9,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { fetchCandles } from '../utils/binanceAPI';
 import { calculateATR } from '../utils/indicators';
 import Skeleton from './Skeleton';
+import { normalize, spacing, fontSize, borderRadius, hp } from '../utils/responsive';
 
 interface ATRCardProps {
   onPress?: () => void;
@@ -87,39 +88,39 @@ export function ATRCard({ onPress, compact = false }: ATRCardProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#1F2937',
-    borderRadius: 20,
-    padding: 20,
-    marginHorizontal: 16,
-    marginTop: 12,
-    minHeight: 120,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    minHeight: hp(15),
   },
   containerCompact: {
-    marginHorizontal: 8,
-    marginTop: 8,
-    padding: 16,
-    minHeight: 120,
+    marginHorizontal: spacing.sm,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    minHeight: hp(15),
   },
-  titleCentered: { textAlign: 'center', color: '#F9FAFB', fontSize: 16, fontWeight: '700' },
-  valueWrapper: { alignItems: 'center', justifyContent: 'center', minHeight: 42, marginTop: 4 },
+  titleCentered: { textAlign: 'center', color: '#F9FAFB', fontSize: fontSize.lg, fontWeight: '700' },
+  valueWrapper: { alignItems: 'center', justifyContent: 'center', minHeight: normalize(42), marginTop: spacing.xs },
   title: {
     color: '#F9FAFB',
-    fontSize: 16,
+    fontSize: fontSize.lg,
     fontWeight: '700',
   },
   value: {
     color: '#F59E0B',
-    fontSize: 26,
+    fontSize: fontSize.xxl,
     fontWeight: '700',
   },
   footnote: {
     color: '#6B7280',
-    fontSize: 10,
+    fontSize: fontSize.xs,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   chartWrapper: {
-    marginTop: 2,
+    marginTop: spacing.xs,
   },
-  helper: { color: '#6B7280', fontSize: 12, marginTop: 4, fontWeight: '600' },
-  helperCentered: { color: '#6B7280', fontSize: 12, marginTop: 6, fontWeight: '600', textAlign: 'center' },
+  helper: { color: '#6B7280', fontSize: fontSize.sm, marginTop: spacing.xs, fontWeight: '600' },
+  helperCentered: { color: '#6B7280', fontSize: fontSize.sm, marginTop: spacing.xs, fontWeight: '600', textAlign: 'center' },
 });

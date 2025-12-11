@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import TradingChart from '../components/TradingChart';
 import { fetchCandles, Candle } from '../utils/binanceAPI';
@@ -61,7 +62,7 @@ const ChartScreen: React.FC = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Timeframe Selector */}
       <View style={styles.timeframeContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -97,7 +98,7 @@ const ChartScreen: React.FC = () => {
           chartType="candle"
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

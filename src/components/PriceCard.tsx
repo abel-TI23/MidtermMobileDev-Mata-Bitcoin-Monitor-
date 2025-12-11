@@ -11,6 +11,8 @@ import { SimplePriceChart } from './SimplePriceChart';
 import { fetchCandles, Candle, fetchTicker24h } from '../utils/binanceAPI';
 import { useTicker, useKlines, marketDataManager } from '../market/MarketDataManager';
 import Skeleton from './Skeleton';
+import { CardIcon, CARD_ICONS } from './CardIcon';
+import { normalize, spacing, fontSize, borderRadius } from '../utils/responsive';
 
 interface PriceCardProps {
   onPress?: () => void;
@@ -175,7 +177,7 @@ const PriceCard: React.FC<PriceCardProps> = ({ onPress }) => {
       <View style={styles.headerRow}>
         <View style={styles.iconLabelRow}>
           <View style={styles.iconCircle}>
-            <Text style={styles.iconText}>B</Text>
+            <CardIcon name={CARD_ICONS.bitcoin} size="sm" color="#F7931A" />
           </View>
           <Text style={styles.label}>BTC</Text>
         </View>
@@ -216,69 +218,69 @@ const styles = StyleSheet.create({
   iconLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.sm,
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: normalize(44),
+    height: normalize(44),
+    borderRadius: normalize(22),
     backgroundColor: '#374151',
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconText: {
     color: '#F9FAFB',
-    fontSize: 20,
+    fontSize: fontSize.lg,
     fontWeight: '700',
   },
   label: {
     color: '#F9FAFB',
-    fontSize: 18,
+    fontSize: fontSize.lg,
     fontWeight: '700',
   },
   changePercent: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '600',
   },
   changeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.round,
     borderWidth: 1,
   },
   price: {
     color: '#F9FAFB',
-    fontSize: 36,
+    fontSize: fontSize.xxxl,
     fontWeight: '700',
     letterSpacing: -1,
   },
   priceCents: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: '#9CA3AF',
   },
   chartContainer: {
-    marginHorizontal: -10,
-    marginTop: 8,
+    marginHorizontal: -spacing.sm,
+    marginTop: spacing.sm,
   },
   errorText: {
     color: '#EF4444',
-    fontSize: 14,
+    fontSize: fontSize.md,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   retryButton: {
     backgroundColor: '#3B82F6',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
     alignSelf: 'center',
   },
   retryText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '700',
   },
 });

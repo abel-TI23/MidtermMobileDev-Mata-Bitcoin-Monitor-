@@ -6,6 +6,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../theme';
 import { TradingSignal } from '../types/signal';
+import { CardIcon, CARD_ICONS } from './CardIcon';
+import { normalize, spacing, fontSize, borderRadius } from '../utils/responsive';
 
 interface SignalCardProps {
   signal: TradingSignal;
@@ -65,6 +67,7 @@ export function SignalCard({ signal, onPress }: SignalCardProps) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
+          <CardIcon name={CARD_ICONS.signal} size="md" color={getActionColor()} />
           <Text style={styles.symbol}>{signal.symbol.replace('USDT', '/USDT')}</Text>
           <View style={[styles.actionBadge, { backgroundColor: getActionColor() + '20' }]}>
             <Text style={styles.actionIcon}>{getActionIcon()}</Text>
@@ -177,95 +180,95 @@ export function SignalCard({ signal, onPress }: SignalCardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#1F2937',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   header: {
-    marginBottom: 14,
+    marginBottom: spacing.md,
   },
   titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   symbol: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     fontWeight: '800',
     color: colors.textPrimary,
   },
   actionBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 4,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.lg,
+    gap: spacing.xs,
   },
   actionIcon: {
-    fontSize: 14,
+    fontSize: fontSize.md,
   },
   actionText: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: '800',
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   stars: {
-    fontSize: 18,
+    fontSize: fontSize.lg,
   },
   scoreText: {
-    fontSize: 15,
+    fontSize: fontSize.md,
     fontWeight: '700',
     color: colors.textSecondary,
   },
   priceSection: {
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   label: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     color: colors.textMuted,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
     fontWeight: '600',
     textTransform: 'uppercase',
   },
   currentPrice: {
-    fontSize: 24,
+    fontSize: fontSize.xxl,
     fontWeight: '800',
     color: '#3B82F6',
   },
   targetsSection: {
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   targetRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 10,
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
   targetItem: {
     flex: 1,
   },
   targetLabel: {
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.textMuted,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
     fontWeight: '600',
     textTransform: 'uppercase',
   },
   targetValue: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '700',
     color: colors.textPrimary,
   },
@@ -273,83 +276,83 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
   rrLabel: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     color: colors.textMuted,
     fontWeight: '600',
   },
   rrValue: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '800',
     color: '#22C55E',
   },
   summarySection: {
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   summary: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     color: colors.textSecondary,
-    lineHeight: 18,
+    lineHeight: normalize(18),
     fontStyle: 'italic',
   },
   reasonsSection: {
     backgroundColor: 'rgba(34, 197, 94, 0.1)',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   reasonsTitle: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     fontWeight: '700',
     color: '#22C55E',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     textTransform: 'uppercase',
   },
   reasonItem: {
     flexDirection: 'row',
-    marginBottom: 6,
-    gap: 6,
+    marginBottom: spacing.xs,
+    gap: spacing.xs,
   },
   reasonBullet: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: '#22C55E',
     fontWeight: '700',
   },
   reasonText: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: normalize(16),
     flex: 1,
   },
   warningsSection: {
     backgroundColor: 'rgba(251, 146, 60, 0.1)',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
   },
   warningItem: {
     flexDirection: 'row',
-    marginBottom: 6,
-    gap: 6,
+    marginBottom: spacing.xs,
+    gap: spacing.xs,
   },
   warningIcon: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
   },
   warningText: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     color: '#FB923C',
-    lineHeight: 16,
+    lineHeight: normalize(16),
     flex: 1,
     fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingTop: 12,
+    paddingTop: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
@@ -357,28 +360,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerLabel: {
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.textMuted,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
     fontWeight: '600',
     textTransform: 'uppercase',
   },
   riskBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
   },
   riskText: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     fontWeight: '800',
   },
   confidenceText: {
-    fontSize: 15,
+    fontSize: fontSize.md,
     fontWeight: '800',
     color: colors.textPrimary,
   },
   positionText: {
-    fontSize: 15,
+    fontSize: fontSize.md,
     fontWeight: '800',
     color: '#3B82F6',
   },

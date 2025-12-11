@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { fetchCandles } from '../utils/binanceAPI';
 import { calculateRSI } from '../utils/indicators';
 import Skeleton from './Skeleton';
+import { normalize, spacing, fontSize, borderRadius, hp } from '../utils/responsive';
 
 interface RSICardProps {
   onPress?: () => void;
@@ -98,39 +99,39 @@ export function RSICard({ onPress, compact = false }: RSICardProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#1F2937',
-    borderRadius: 20,
-    padding: 20,
-    marginHorizontal: 16,
-    marginTop: 12,
-    minHeight: 120,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    minHeight: hp(15),
   },
   containerCompact: {
-    marginHorizontal: 8,
-    marginTop: 8,
-    padding: 16,
-    minHeight: 120,
+    marginHorizontal: spacing.sm,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    minHeight: hp(15),
   },
   titleCentered: {
     color: '#F9FAFB',
-    fontSize: 16,
+    fontSize: fontSize.lg,
     fontWeight: '700',
     textAlign: 'center',
   },
-  valueWrapper: { alignItems: 'center', justifyContent: 'center', minHeight: 42, marginTop: 4 },
+  valueWrapper: { alignItems: 'center', justifyContent: 'center', minHeight: normalize(42), marginTop: spacing.xs },
   title: {
     color: '#F9FAFB',
-    fontSize: 16,
+    fontSize: fontSize.lg,
     fontWeight: '700',
   },
   value: {
     color: '#8B5CF6',
-    fontSize: 26,
+    fontSize: fontSize.xxl,
     fontWeight: '700',
   },
   signalText: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
-  signalTextCentered: { fontSize: 12, fontWeight: '700', marginTop: 6, textAlign: 'center' },
+  signalTextCentered: { fontSize: fontSize.sm, fontWeight: '700', marginTop: spacing.xs, textAlign: 'center' },
 });

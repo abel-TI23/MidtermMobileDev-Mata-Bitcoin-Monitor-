@@ -32,6 +32,7 @@ import { RSICard } from '../components/RSICard';
 import { VolumeCard } from '../components/VolumeCard';
 import OrderBookCard from '../components/OrderBookCard';
 import MarketDominanceCard from '../components/MarketDominanceCard';
+import { ResponsiveGrid } from '../components/ResponsiveGrid';
 import { colors } from '../theme';
 import { fetchFearGreedIndex } from '../utils/fearGreedAPI';
 import { REFRESH_INTERVALS } from '../utils/performanceConfig';
@@ -48,6 +49,7 @@ import { calculateEMA, calculateSMA } from '../utils/indicators';
 import { generateMockCandles, generateMockTicker, updateMockCandle } from '../utils/mockData';
 import { useKlines } from '../market/MarketDataManager';
 import { useSettings } from '../hooks/useSettings';
+import { normalize, spacing, fontSize, borderRadius } from '../utils/responsive';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList, 'Home'>,
@@ -402,34 +404,18 @@ const HomeScreen: React.FC = () => {
         )}
 
         {/* 1. Price Card (Hero - Full Width) */}
-  <PriceCard onPress={onPressPriceCard} />
+        <PriceCard onPress={onPressPriceCard} />
 
-        {/* Grid under Price: Volume + Sentiment (row 1) and ATR + RSI (row 2) */}
-        <View style={styles.multiGridWrapper}>
-          <View style={styles.gridRowTight}>
-            <View style={styles.gridItemTight}>
-              <VolumeCard compact onPress={onPressVolumeCard} />
-            </View>
-            <View style={styles.gridItemTight}>
-              <FearGreedCard compact value={fgValue} label={fgLabel} lastUpdated={fgUpdated} onPress={onPressFG} />
-            </View>
-          </View>
-          <View style={styles.gridRowTight}>
-            <View style={styles.gridItemTight}>
-              <ATRCard compact onPress={onPressATR} />
-            </View>
-            <View style={styles.gridItemTight}>
-              <RSICard compact onPress={onPressRSI} />
-            </View>
-          </View>
-          <View style={styles.gridRowTight}>
-            <View style={styles.gridItemTight}>
-              <OrderBookCard compact />
-            </View>
-            <View style={styles.gridItemTight}>
-              <MarketDominanceCard compact />
-            </View>
-          </View>
+        {/* Responsive Grid - 1 column on phone, 2 columns on tablet */}
+        <View style={{ paddingHorizontal: 16 }}>
+          <ResponsiveGrid spacing={16}>
+            <VolumeCard compact onPress={onPressVolumeCard} />
+            <FearGreedCard compact value={fgValue} label={fgLabel} lastUpdated={fgUpdated} onPress={onPressFG} />
+            <ATRCard compact onPress={onPressATR} />
+            <RSICard compact onPress={onPressRSI} />
+            <OrderBookCard compact />
+            <MarketDominanceCard compact />
+          </ResponsiveGrid>
         </View>
 
         {/* (Market Metrics removed - API issues) */}
@@ -463,73 +449,73 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: '#F9FAFB',
-    fontSize: 18,
+    fontSize: fontSize.lg,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   loadingSubtext: {
     color: '#9CA3AF',
-    fontSize: 14,
+    fontSize: fontSize.md,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing.sm,
   },
   settingsButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: normalize(36),
+    height: normalize(36),
+    borderRadius: borderRadius.lg,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   settingsIcon: {
-    fontSize: 18,
+    fontSize: fontSize.lg,
   },
   headerTitle: {
     color: '#F9FAFB',
-    fontSize: 28,
+    fontSize: fontSize.xxxl,
     fontWeight: '800',
   },
   headerSubtitle: {
     color: '#9CA3AF',
-    fontSize: 14,
+    fontSize: fontSize.md,
     fontWeight: '500',
   },
   // Replaced connectionStatus with Badge component
   lastUpdate: {
     color: colors.textMuted,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   intervalContainer: {
-    marginHorizontal: 16,
-    marginVertical: 12,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.sm,
   },
   sectionTitle: {
     color: '#F9FAFB',
-    fontSize: 16,
+    fontSize: fontSize.lg,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   intervalScroll: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
   },
   intervalButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
     backgroundColor: '#1E222D',
     borderWidth: 1,
     borderColor: '#2D3748',
@@ -540,56 +526,56 @@ const styles = StyleSheet.create({
   },
   intervalButtonText: {
     color: '#9CA3AF',
-    fontSize: 13,
+    fontSize: fontSize.sm,
     fontWeight: '600',
   },
   intervalButtonTextActive: {
     color: '#FDE68A',
   },
   indicatorsContainer: {
-    marginHorizontal: 16,
-    marginVertical: 12,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.sm,
   },
   togglesRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.sm,
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   footerText: {
     color: '#6B7280',
-    fontSize: 12,
+    fontSize: fontSize.sm,
     textAlign: 'center',
-    marginVertical: 2,
+    marginVertical: spacing.xs,
   },
   twoColumnGrid: {
     flexDirection: 'row',
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.sm,
     gap: 0,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   gridItem: {
     flex: 1,
   },
   gridRow: {
     flexDirection: 'row',
-    paddingHorizontal: 8,
-    marginTop: 8,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.sm,
   },
   gridCol: {
     flex: 1,
   },
   multiGridWrapper: {
-    paddingHorizontal: 4,
-    marginTop: 4,
+    paddingHorizontal: spacing.xs,
+    marginTop: spacing.xs,
   },
   gridRowTight: {
     flexDirection: 'row',
-    marginHorizontal: 4,
-    marginTop: 4,
+    marginHorizontal: spacing.xs,
+    marginTop: spacing.xs,
   },
   gridItemTight: {
     flex: 1,
